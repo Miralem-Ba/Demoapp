@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: demoapp_db
+      POSTGRES_USER: demoapp_user
+      POSTGRES_PASSWORD: demoapp_password
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: python src/demoapp/manage.py runserver 0.0.0.0:8080
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_NAME: demoapp_db
+      DB_USER: demoapp_user
+      DB_PASSWORD: demoapp_password
+      DB_HOST: db
+      DB_PORT: 5432
+
+volumes:
+  postgres_data:
